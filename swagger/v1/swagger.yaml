@@ -1,0 +1,489 @@
+---
+swagger: '2.0'
+info:
+  title: Book-a-doctor-api-v1
+  version: v1
+paths:
+  "/v1/appointments":
+    get:
+      summary: list appointments
+      tags:
+      - Appointments
+      consumes:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        type: string
+      responses:
+        '200':
+          description: Get all appointment for a user
+          schema:
+            type: object
+            properties:
+              message:
+                type: array
+                items:
+                  type: string
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    user_id:
+                      type: integer
+                    date_of_appointment:
+                      type: string
+                    imageUrl:
+                      type: string
+                      nullable: true
+                    doctor_id:
+                      type: integer
+                    doctor:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        city:
+                          type: string
+                        specialization:
+                          type: string
+                        cost_per_day:
+                          type: integer
+                        description:
+                          type: string
+        '404':
+          description: No appointment
+          schema:
+            type: object
+            properties:
+              message:
+                type: array
+                items:
+                  type: string
+              error:
+                type: string
+    post:
+      summary: create appointment
+      tags:
+      - Appointments
+      consumes:
+      - application/json
+      security:
+      - Bearer: {}
+      parameters:
+      - name: Authorization
+        in: header
+        type: string
+      - name: params
+        in: body
+        schema:
+          type: object
+          properties:
+            date_of_appointment:
+              type: string
+            doctor_id:
+              type: string
+          require:
+          - doctor_id
+          - date_of_appointment
+      responses:
+        '201':
+          description: Appointment created
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  doctor_id:
+                    type: integer
+                  date_of_appointment:
+                    type: string
+        '403':
+          description: Appointment not created
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              error_message:
+                type: object
+                properties:
+                  doctor:
+                    type: array
+                  date_of_appointment:
+                    type: array
+  "/v1/appointments/{id}":
+    delete:
+      summary: delete appointment
+      tags:
+      - Appointments
+      consumes:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        type: string
+      - name: id
+        in: path
+        type: string
+        required: true
+      responses:
+        '200':
+          description: successful
+          schema:
+            type: object
+            properties:
+              message:
+                type: array
+                items:
+                  type: string
+              data:
+                type: object
+                properties:
+                  doctor_id:
+                    type: integer
+                  date_of_appointment:
+                    type: string
+                  user_id:
+                    type: integer
+        '404':
+          description: not found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              error_message:
+                type: array
+                items:
+                  type: string
+  "/v1/doctors/{id}":
+    get:
+      summary: Retrieves a doctor
+      tags:
+      - Doctors
+      produces:
+      - application/json
+      - application/xml
+      security:
+      - Bearer: {}
+      parameters:
+      - name: Authorization
+        in: header
+        type: string
+      - name: id
+        in: path
+        type: string
+        required: true
+      responses:
+        '200':
+          description: name found
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              city:
+                type: string
+              specialization:
+                type: string
+              cost_per_day:
+                type: integer
+              description:
+                type: string
+            required:
+            - id
+            - name
+            - city
+            - specialization
+            - cost_per_day
+            - description
+        '404':
+          description: doctor not found
+    parameters:
+    - name: id
+      in: path
+      type: string
+      description: id
+      required: true
+    delete:
+      summary: delete doctor
+      tags:
+      - Doctors
+      produces:
+      - application/json
+      security:
+      - Bearer: {}
+      parameters:
+      - name: Authorization
+        in: header
+        type: string
+      - name: id
+        in: path
+        type: string
+        required: true
+      responses:
+        '200':
+          description: Doctor deleted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+            - message
+        '404':
+          description: No doctors found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              error_message:
+                type: array
+  "/v1/doctors":
+    post:
+      summary: Creates a doctor
+      tags:
+      - Doctors
+      consumes:
+      - application/json
+      - application/xml
+      security:
+      - Bearer: {}
+      parameters:
+      - name: Authorization
+        in: header
+        type: string
+      - name: doctor
+        in: body
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            specialization:
+              type: string
+            city:
+              type: string
+            cost_per_day:
+              type: integer
+            description:
+              type: string
+            image_url:
+              type: string
+          required:
+          - name
+          - specialization
+          - city
+          - cost_per_day
+          - description
+      responses:
+        '201':
+          description: doctor created
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              city:
+                type: string
+              specialization:
+                type: string
+              costPerDay:
+                type: integer
+              imageUrl:
+                type: string
+                nullable: true
+              description:
+                type: string
+        '422':
+          description: invalid request
+    get:
+      summary: Get all doctors
+      tags:
+      - Doctors
+      consumes:
+      - application/json
+      - application/xml
+      security:
+      - Bearer: {}
+      parameters:
+      - name: Authorization
+        in: header
+        type: string
+      responses:
+        '200':
+          description: All doctors fetched
+          schema:
+            type: object
+            properties:
+              message:
+                type: array
+                items:
+                  type: string
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    city:
+                      type: string
+                    specialization:
+                      type: string
+                    costPerDay:
+                      type: integer
+                    imageUrl:
+                      type: string
+                      nullable: true
+                    description:
+                      type: string
+  "/v1/users/login":
+    post:
+      summary: Login to get user details and jwt token
+      tags:
+      - Users
+      consumes:
+      - application/json
+      parameters:
+      - name: params
+        in: body
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+            password:
+              type: string
+          require:
+          - email
+          - password
+      responses:
+        '200':
+          description: user logged in
+        '401':
+          description: Invalid password
+  "/v1/users/signup":
+    post:
+      summary: Creates a user
+      tags:
+      - Users
+      consumes:
+      - application/json
+      - application/xml
+      parameters:
+      - name: user
+        in: body
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+            password:
+              type: string
+          required:
+          - name
+          - email
+          - password
+      responses:
+        '200':
+          description: User created
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+              exp:
+                type: string
+              user_details:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  email:
+                    type: string
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+                  name:
+                    type: string
+                  role:
+                    type: string
+        '403':
+          description: Bad parameters
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              error_message:
+                type: object
+                properties:
+                  email:
+                    type: array
+                  password:
+                    type: array
+                  name:
+                    type: array
+  "/v1/users/fetch_current_user":
+    get:
+      summary: Fetch current user object
+      tags:
+      - Users
+      produces:
+      - application/json
+      - application/xml
+      security:
+      - Bearer: {}
+      parameters:
+      - name: Authorization
+        in: header
+        type: string
+      responses:
+        '200':
+          description: current user has been found
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              email:
+                type: string
+              image_url:
+                type: string
+              created_at:
+                type: string
+              updated_at:
+                type: string
+              image:
+                type: object
+        '401':
+          description: Unathorized
+servers:
+- url: http://{defaultHost}
+  variables:
+    defaultHost:
+      default: localhost:3001
+securityDefinitions:
+  JWT:
+    description: the jwt for API auth
+    type: apiKey
+    name: Authorization
+    in: header
